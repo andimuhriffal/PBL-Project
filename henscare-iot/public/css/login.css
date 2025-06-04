@@ -1,0 +1,26 @@
+body {
+        background-image: url('/images/bg-login-1.jpg');
+        background-size: cover;
+        background-position: center;
+        font-family: Arial, sans-serif;
+        position: relative;
+    }
+
+    /* Overlay gelap */
+    body::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        /* Ubah 0.5 untuk lebih gelap atau terang */
+        z-index: 0;
+    }
+
+    .glass {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(3px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        position: relative;
+        z-index: 10;
+    }

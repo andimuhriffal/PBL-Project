@@ -1,0 +1,500 @@
+:root {
+    --primary-blue: #2e86ab;
+    --secondary-green: #a23b72;
+    --accent-orange: #f18f01;
+    --light-gray: #f8f9fa;
+    --dark-overlay: rgba(0, 0, 0, 0.6);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+}
+
+.boody {
+    padding-top: 30px;
+}
+
+/* Hero Section */
+.hero-section {
+    height: 70vh;
+    background: linear-gradient(var(--dark-overlay), var(--dark-overlay)),
+        url("https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2126&q=80")
+            center/cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    position: relative;
+}
+
+.hero-content h1 {
+    font-size: 4.5rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    animation: fadeInUp 1s ease-out;
+}
+
+.hero-subtitle {
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: var(--accent-orange);
+    animation: fadeInUp 1s ease-out 0.3s both;
+}
+
+/* Description Section */
+.description-section {
+    padding: 80px 0;
+    background: white;
+}
+
+.description-text {
+    font-size: 1.2rem;
+    line-height: 1.8;
+    color: #666;
+    margin-bottom: 3rem;
+    animation: fadeInUp 1s ease-out 0.6s both;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-action {
+    padding: 1.2rem 3rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: none;
+    position: relative;
+    overflow: hidden;
+    animation: fadeInUp 1s ease-out 0.9s both;
+}
+
+.btn-primary-action {
+    background: linear-gradient(
+        135deg,
+        var(--primary-blue),
+        var(--secondary-green)
+    );
+    color: white;
+    box-shadow: 0 8px 25px rgba(46, 134, 171, 0.3);
+}
+
+.btn-primary-action:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(46, 134, 171, 0.4);
+    color: white;
+}
+
+.btn-secondary-action {
+    background: white;
+    color: var(--primary-blue);
+    border: 2px solid var(--primary-blue);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.btn-secondary-action:hover {
+    background: var(--primary-blue);
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(46, 134, 171, 0.3);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes float {
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Section Styling */
+.section {
+    padding: 80px 0;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 3rem;
+    color: var(--primary-blue);
+    position: relative;
+}
+
+.section-title::after {
+    content: "";
+    width: 100px;
+    height: 4px;
+    background: var(--accent-orange);
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 2px;
+}
+
+/* Problem Cards */
+.problem-card {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border-left: 5px solid var(--secondary-green);
+}
+
+.problem-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.problem-icon {
+    font-size: 3rem;
+    color: var(--secondary-green);
+    margin-bottom: 1rem;
+}
+
+/* Solution Cards */
+.solution-card {
+    background: white;
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.solution-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(
+        90deg,
+        var(--primary-blue),
+        var(--accent-orange)
+    );
+}
+
+.solution-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+}
+
+.solution-icon {
+    font-size: 4rem;
+    color: var(--primary-blue);
+    margin-bottom: 1.5rem;
+    animation: float 3s ease-in-out infinite;
+}
+
+.solution-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+    margin-bottom: 1rem;
+}
+
+/* Team Cards */
+.team-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.team-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        135deg,
+        var(--primary-blue),
+        var(--secondary-green)
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.team-card:hover::before {
+    opacity: 0.1;
+}
+
+.team-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+}
+
+.team-photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: contain;
+    margin: 0 auto 1.5rem;
+    border: 5px solid var(--accent-orange);
+    transition: all 0.3s ease;
+}
+
+.team-card:hover .team-photo {
+    transform: scale(1.1);
+    border-color: var(--primary-blue);
+}
+
+.team-name {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+    margin-bottom: 0.5rem;
+}
+
+.team-nim {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.team-role {
+    color: var(--secondary-green);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+/* Contact Section */
+.contact-section {
+    background: linear-gradient(
+        135deg,
+        var(--primary-blue),
+        var(--secondary-green)
+    );
+    color: rgb(255, 255, 255);
+}
+
+.contact-info {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.contact-icon {
+    font-size: 3rem;
+    color: var(--accent-orange);
+    animation: float 3s ease-in-out infinite;
+}
+
+.email-link {
+    color: var(--accent-orange);
+    font-size: 1.3rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    padding: 1rem 2rem;
+    border: 2px solid var(--accent-orange);
+    border-radius: 50px;
+    display: inline-block;
+}
+
+.email-link:hover {
+    background: var(--accent-orange);
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(241, 143, 1, 0.3);
+}
+
+.instagram-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+}
+
+.instagram-item {
+    animation: fadeInUp 0.6s ease-out both;
+}
+
+.instagram-item:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.instagram-item:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.instagram-item:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.instagram-item:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+.instagram-item:nth-child(5) {
+    animation-delay: 0.5s;
+}
+
+.instagram-link {
+    color: white;
+    font-size: 1.2rem;
+    text-decoration: none;
+    padding: 1rem 2rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50px;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    min-width: 200px;
+    justify-content: center;
+}
+
+.instagram-link:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: var(--accent-orange);
+    color: var(--accent-orange);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.instagram-link i {
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.instagram-link:hover i {
+    animation: bounce 0.6s ease-in-out;
+}
+
+@keyframes bounce {
+    0%,
+    20%,
+    60%,
+    100% {
+        transform: translateY(0);
+    }
+
+    40% {
+        transform: translateY(-5px);
+    }
+
+    80% {
+        transform: translateY(-3px);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero-content h1 {
+        font-size: 3rem;
+    }
+
+    .section {
+        padding: 50px 0;
+    }
+
+    .solution-card,
+    .team-card {
+        margin-bottom: 2rem;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .btn-action {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .instagram-list {
+        gap: 0.8rem;
+    }
+
+    .instagram-link {
+        min-width: 180px;
+        font-size: 1.1rem;
+        padding: 0.8rem 1.5rem;
+    }
+}
+
+/* Background Patterns */
+.bg-pattern {
+    background: var(--light-gray);
+    position: relative;
+}
+
+.bg-pattern::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(
+        circle at 25% 25%,
+        rgba(46, 134, 171, 0.1) 2px,
+        transparent 2px
+    );
+    background-size: 50px 50px;
+}
+
+.navbar-light-custom {
+    background-color: rgb(187, 187, 171) !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand,
+.nav-link {
+    font-weight: 600;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    color: #333 !important;
+}
+
+.nav-link:hover {
+    text-decoration: underline;
+}
