@@ -1,6 +1,7 @@
 version: "3.8"
 
 services:
+  # === LARAVEL & NGINX ===
   laravel-app:
     build:
       context: ./henscare-iot
@@ -28,6 +29,40 @@ services:
     networks:
       - app-network
 
+  # === ELK STACK ===
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.20
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+    networks:
+      - app-network
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.17.20
+    container_name: logstash
+    volumes:
+      - ./elk/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    ports:
+      - "12201:12201/udp"
+    depends_on:
+      - elasticsearch
+    networks:
+      - app-network
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.20
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - app-network
+
   # === SPRING BOOT MICROSERVICES ===
   eureka-server:
     build: ./eureka-service
@@ -36,6 +71,10 @@ services:
       - "8761:8761"
     networks:
       - app-network
+    logging:
+      driver: "gelf"
+      options:
+        gelf-address: "udp://logstash:12201"
 
   api-gateway:
     build: ./api-gateway-service
@@ -46,6 +85,10 @@ services:
       - eureka-server
     networks:
       - app-network
+    logging:
+      driver: "gelf"
+      options:
+        gelf-address: "udp://logstash:12201"
 
   dht-service:
     build: ./dht-service
@@ -56,6 +99,10 @@ services:
       - eureka-server
     networks:
       - app-network
+    logging:
+      driver: "gelf"
+      options:
+        gelf-address: "udp://logstash:12201"
 
   ultrasonik-service:
     build: ./ultrasonik-service
@@ -66,6 +113,10 @@ services:
       - eureka-server
     networks:
       - app-network
+    logging:
+      driver: "gelf"
+      options:
+        gelf-address: "udp://logstash:12201"
 
   rtc-service:
     build: ./rtc-service
@@ -76,6 +127,10 @@ services:
       - eureka-server
     networks:
       - app-network
+    logging:
+      driver: "gelf"
+      options:
+        gelf-address: "udp://logstash:12201"
 
   auth-service:
     build: ./auth-service
@@ -84,6 +139,10 @@ services:
       - "8085:8085"
     networks:
       - app-network
+    logging:
+      driver: "gelf"
+      options:
+        gelf-address: "udp://logstash:12201"
 
 networks:
   app-network:

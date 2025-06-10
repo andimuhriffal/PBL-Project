@@ -17,8 +17,13 @@ public class UltrasonikServiceImpl implements UltrasonikService {
     @Autowired
     private UltrasonikRepository repository;
 
+    @Autowired
+    private TelegramService telegramService;
+
     private static final float BATAS_SELISIH_TINGGI_CM = 4.0f;
     private static final long BATAS_MENIT_MATI = 2;
+
+    private SensorStatus lastStatus = SensorStatus.NORMAL;
 
     @Override
     public UltrasonikData saveData(UltrasonikRequest request) {
@@ -27,7 +32,51 @@ public class UltrasonikServiceImpl implements UltrasonikService {
         data.setPersentaseAir(request.getPersentaseAir());
         data.setKranTerbuka(request.isKranTerbuka());
         data.setStatusAir(request.getStatusAir());
-        data.setStatusSensor(SensorStatus.NORMAL); // default
+
+        // Ambil 5 data terakhir
+        List<UltrasonikData> riwayat = repository.findTop5ByOrderByTimestampDesc();
+
+        boolean semua0 = true;
+        boolean fluktuasiTinggi = false;
+
+        for (UltrasonikData d : riwayat) {
+            float tinggi = d.getTinggiAir();
+
+            if (tinggi != 0f) {
+                semua0 = false;
+            }
+
+            if (Math.abs(tinggi - request.getTinggiAir()) > BATAS_SELISIH_TINGGI_CM) {
+                fluktuasiTinggi = true;
+            }
+        }
+
+        SensorStatus status;
+
+        if (semua0 && riwayat.size() >= 3) {
+            status = SensorStatus.MATI;
+            if (lastStatus != SensorStatus.MATI) {
+                telegramService.sendMessage("❌ *Sensor Ultrasonik Terindikasi Mati!*\nSemua pembacaan tinggi air = 0.");
+            }
+        } else if (fluktuasiTinggi) {
+            status = SensorStatus.TIDAK_STABIL;
+            if (lastStatus != SensorStatus.TIDAK_STABIL) {
+                telegramService.sendMessage("⚠️ *Sensor Tidak Stabil!*\nTerjadi fluktuasi tinggi air lebih dari 4 cm.");
+            }
+        } else {
+            status = SensorStatus.NORMAL;
+            if (lastStatus != SensorStatus.NORMAL) {
+                telegramService.sendMessage("✅ *Sensor Kembali Normal.*");
+            }
+        }
+
+        lastStatus = status;
+        data.setStatusSensor(status);
+        if (request.getTinggiAir() > 4.0f) {
+            telegramService.sendMessage("🔔 Air Pakan Kepenuhan");
+        } else if (request.getTinggiAir() == 0f) {
+            telegramService.sendMessage("🚨 Air Pakan Habis");
+        }
 
         return repository.save(data);
     }
@@ -45,47 +94,8 @@ public class UltrasonikServiceImpl implements UltrasonikService {
         LocalDateTime sekarang = LocalDateTime.now();
         Duration durasi = Duration.between(dataTerbaru.getTimestamp(), sekarang);
 
-        // Jika data tidak diperbarui > 2 menit
         if (durasi.toMinutes() > BATAS_MENIT_MATI) {
             dataTerbaru.setStatusSensor(SensorStatus.MATI);
-            return dataTerbaru;
-        }
-
-        List<UltrasonikData> riwayat = repository.findTop5ByOrderByTimestampDesc();
-
-        boolean ada0 = false;
-        boolean adaNon0 = false;
-        boolean selisihTinggiLebih4 = false;
-        boolean semua0Selama2Menit = true;
-
-        float tinggiTerbaru = dataTerbaru.getTinggiAir();
-
-        for (UltrasonikData data : riwayat) {
-            float tinggi = data.getTinggiAir();
-
-            if (tinggi == 0f) {
-                ada0 = true;
-                Duration d = Duration.between(data.getTimestamp(), sekarang);
-                if (d.toMinutes() < BATAS_MENIT_MATI) {
-                    semua0Selama2Menit = false;
-                }
-            } else {
-                adaNon0 = true;
-                semua0Selama2Menit = false;
-            }
-
-            float selisih = Math.abs(tinggi - tinggiTerbaru);
-            if (selisih > BATAS_SELISIH_TINGGI_CM) {
-                selisihTinggiLebih4 = true;
-            }
-        }
-
-        if (semua0Selama2Menit) {
-            dataTerbaru.setStatusSensor(SensorStatus.MATI);
-        } else if ((ada0 && adaNon0) || selisihTinggiLebih4 || tinggiTerbaru > 4.0f) {
-            dataTerbaru.setStatusSensor(SensorStatus.TIDAK_STABIL);
-        } else {
-            dataTerbaru.setStatusSensor(SensorStatus.NORMAL);
         }
 
         return dataTerbaru;

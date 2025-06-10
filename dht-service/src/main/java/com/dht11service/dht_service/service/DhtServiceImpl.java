@@ -14,33 +14,71 @@ public class DhtServiceImpl implements DhtService {
     @Autowired
     private DhtRepository dhtRepository;
 
-    private static final int MAX_INVALID_COUNT = 5; // threshold invalid berturut-turut
+    @Autowired
+    private TelegramService telegramService;
+
+    private static final int MAX_INVALID_COUNT = 5;
     private int invalidCount = 0;
 
     private DhtData lastData = null;
+    private String lastSensorStatus = "AKTIF"; // Tambahan: menyimpan status sensor sebelumnya
+
+    private static final int MAX_TEMPERATURE = 35;
+    private static final int MIN_TEMPERATURE = 15;
 
     @Override
     public DhtData simpanData(DhtRequest request) {
         String statusSensor = "AKTIF";
-
-        // Cek apakah data suhu atau kelembapan invalid (misal 0)
         boolean dataInvalid = (request.getSuhu() == 0 || request.getKelembapan() == 0);
 
         if (dataInvalid) {
             invalidCount++;
         } else {
-            invalidCount = 0; // reset jika data valid
+            invalidCount = 0;
         }
 
         if (invalidCount >= MAX_INVALID_COUNT) {
             statusSensor = "MATI";
+
+            if (!"MATI".equals(lastSensorStatus)) {
+                telegramService.sendMessage(
+                    "🚨 *Sensor DHT11 Mati!*\nTidak ada data suhu/kelembapan yang valid selama 5 kali berturut-turut.");
+            }
+
         } else if (lastData != null) {
             if (dataInvalid || isDataDrasticallyDifferent(lastData, request)) {
                 statusSensor = "GANGGUAN";
+
+                if (!"GANGGUAN".equals(lastSensorStatus)) {
+                    telegramService.sendMessage(String.format(
+                        "⚠️ *Gangguan pada Sensor DHT11!*\nData berubah drastis atau tidak valid.\nSuhu: %d°C, Kelembapan: %d%%",
+                        request.getSuhu(), request.getKelembapan()));
+                }
             }
         }
 
-        // Simpan data ke database (meskipun sensor mati)
+        // ✅ Sensor kembali normal
+        if ("AKTIF".equals(statusSensor) && !"AKTIF".equals(lastSensorStatus)) {
+            telegramService.sendMessage(
+                "✅ *Sensor DHT11 Kembali Normal!*\nData suhu dan kelembapan telah valid kembali.");
+        }
+
+        // 🔥 Suhu terlalu panas
+        if (request.getSuhu() > MAX_TEMPERATURE) {
+            request.setKipasStatus(true);
+            telegramService.sendMessage(String.format(
+                "🔥 *Peringatan Suhu Tinggi!*\nSuhu: *%d°C*\n💨 Kipas dinyalakan.",
+                request.getSuhu()));
+        }
+
+        // ❄️ Suhu terlalu dingin
+        if (request.getSuhu() < MIN_TEMPERATURE) {
+            request.setLampuStatus(true);
+            telegramService.sendMessage(String.format(
+                "❄️ *Peringatan Suhu Rendah!*\nSuhu: *%d°C*\n💡 Lampu dinyalakan.",
+                request.getSuhu()));
+        }
+
         DhtData data = new DhtData();
         data.setSuhu(request.getSuhu());
         data.setKelembapan(request.getKelembapan());
@@ -50,19 +88,18 @@ public class DhtServiceImpl implements DhtService {
         data.setTimestamp(LocalDateTime.now());
 
         lastData = data;
-
+        lastSensorStatus = statusSensor; // Perbarui status sensor terakhir
         return dhtRepository.save(data);
     }
 
-    private boolean isDataDrasticallyDifferent(DhtData lastData, DhtRequest current) {
-        int deltaSuhu = Math.abs(lastData.getSuhu() - current.getSuhu());
-        int deltaKelembapan = Math.abs(lastData.getKelembapan() - current.getKelembapan());
-
-        return deltaSuhu > 10 || deltaKelembapan > 20;
+    private boolean isDataDrasticallyDifferent(DhtData last, DhtRequest current) {
+        int suhuDiff = Math.abs(last.getSuhu() - current.getSuhu());
+        int kelembapanDiff = Math.abs(last.getKelembapan() - current.getKelembapan());
+        return suhuDiff >= 10 || kelembapanDiff >= 15;
     }
 
     @Override
     public DhtData ambilDataTerbaru() {
-        return dhtRepository.findTopByOrderByTimestampDesc();
+        throw new UnsupportedOperationException("Unimplemented method 'ambilDataTerbaru'");
     }
 }

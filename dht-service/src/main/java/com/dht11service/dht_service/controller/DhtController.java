@@ -15,14 +15,12 @@ public class DhtController {
     @Autowired
     private DhtService dhtService;
 
-    // Endpoint POST: menerima data dari mikrokontroler
     @PostMapping
     public ResponseEntity<DhtData> kirimData(@RequestBody DhtRequest request) {
         DhtData savedData = dhtService.simpanData(request);
         return ResponseEntity.ok(savedData);
     }
 
-    // Endpoint GET: ambil data DHT terbaru
     @GetMapping("/latest")
     public ResponseEntity<?> ambilDataTerbaru() {
         DhtData latest = dhtService.ambilDataTerbaru();
