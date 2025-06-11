@@ -37,7 +37,9 @@ class AuthController extends Controller
             return redirect()->route('login')->with('success', 'Registrasi berhasil, silakan login.');
         }
 
-        return back()->withErrors(['register_error' => $response->body()])->withInput();
+        return back()->withErrors([
+            'register_error' => $response->json('message') ?? 'Registrasi gagal. Silakan coba lagi.',
+        ])->withInput();
     }
 
     public function login(Request $request)
@@ -54,6 +56,8 @@ class AuthController extends Controller
 
         if ($response->successful()) {
             $token = $response->body();
+
+            // Validasi format JWT
             if (substr_count($token, '.') === 2) {
                 session(['jwt_token' => $token]);
                 return redirect()->route('dashboard');
@@ -62,7 +66,7 @@ class AuthController extends Controller
             return back()->withErrors(['login_error' => 'Login gagal. Token tidak valid.']);
         }
 
-        return back()->withErrors(['login_error' => 'Email atau password salah']);
+        return back()->withErrors(['login_error' => 'Email atau password salah.']);
     }
 
     public function dashboard()
@@ -70,22 +74,25 @@ class AuthController extends Controller
         $token = session('jwt_token');
 
         if (!$token) {
-            return redirect()->route('login')->withErrors(['auth' => 'Silakan login dulu.']);
+            return redirect()->route('login')->withErrors(['auth' => 'Silakan login terlebih dahulu.']);
         }
 
-        $response = Http::withToken($token)->get('http://auth-service:8085/api/auth/protected-endpoint');
+        // Panggil endpoint validasi atau data protected di auth-service
+        $response = Http::withToken($token)->get('http://auth-service:8085/api/auth/validate');
 
         if ($response->successful()) {
-            $data = $response->body();
-            return view('dashboard', ['data' => $data]);
+            $userEmail = $response->body(); // Misal: email pengguna
+
+            return view('dashboard', ['email' => $userEmail]);
         }
 
-        return redirect()->route('login')->withErrors(['auth' => 'Token tidak valid atau kadaluarsa.']);
+        session()->forget('jwt_token');
+        return redirect()->route('login')->withErrors(['auth' => 'Session kadaluarsa atau token tidak valid. Silakan login kembali.']);
     }
 
     public function logout()
     {
         session()->forget('jwt_token');
-        return redirect()->route('login');
+        return redirect()->route('login')->with('success', 'Berhasil logout.');
     }
 }

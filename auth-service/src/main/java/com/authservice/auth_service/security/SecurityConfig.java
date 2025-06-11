@@ -1,5 +1,6 @@
 package com.authservice.auth_service.security;
 
+import com.authservice.auth_service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -7,18 +8,17 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.filter.OncePerRequestFilter;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import org.springframework.web.filter.OncePerRequestFilter;
-
-import com.authservice.auth_service.repository.UserRepository;
 
 import java.io.IOException;
 
@@ -48,7 +48,7 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // Filter untuk ekstrak dan validasi JWT dari header Authorization
+    // JWT Filter untuk mengambil token dan validasi
     public static class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         private final JwtUtil jwtUtil;
@@ -70,14 +70,13 @@ public class SecurityConfig {
                 String token = authHeader.substring(7);
 
                 if (jwtUtil.validateToken(token)) {
-                    String email = jwtUtil.extractEmail(token);
+                    String email = jwtUtil.extractUsername(token); // ✅ disesuaikan dengan JwtUtil terbaru
 
                     userRepository.findByEmail(email).ifPresent(user -> {
-                        Authentication auth = new UsernamePasswordAuthenticationToken(
-                                user, null, null
+                        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                                user, null, null // bisa ditambahkan authorities jika tersedia
                         );
-                        // Set Authentication ke context security
-                        org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(auth);
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
                     });
                 }
             }

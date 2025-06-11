@@ -11,7 +11,7 @@ import java.util.Date;
 public class JwtUtil {
 
     private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-    private final long expirationMillis = 24 * 60 * 60 * 1000;
+    private final long expirationMillis = 24 * 60 * 60 * 1000; // 24 jam
 
     public String generateToken(String email) {
         return Jwts.builder()
@@ -22,20 +22,20 @@ public class JwtUtil {
                 .compact();
     }
 
-    public String extractEmail(String token) {
-        return parseClaims(token).getSubject();
-    }
-
     public boolean validateToken(String token) {
         try {
-            parseClaims(token);
+            extractAllClaims(token); // validasi internal
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
     }
 
-    private Claims parseClaims(String token) {
+    public String extractUsername(String token) {
+        return extractAllClaims(token).getSubject();
+    }
+
+    public Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()

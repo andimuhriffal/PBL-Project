@@ -20,14 +20,17 @@ Route::get('register', [AuthController::class, 'showRegisterForm'])->name('regis
 Route::post('register', [AuthController::class, 'register'])->name('register.post');
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::get('dashboard', [AuthController::class, 'dashboard'])->name('dashboard');
-Route::get('tabel-pakan', [IotController::class, 'index'])->name('tabel.pakan');
-Route::get('sensor-health', function () {
-    return view('layouts.sensor-health');
-})->name('sensor-health');
-Route::get('status-kandang', function () {
-    return view('layouts.status');
-})->name('status');
-Route::get('kontrol-modul', function () {
-    return view('layouts.modul-kontrol');
-})->name('kontrol.modul');
+// Protected routes
+Route::middleware(['verify.jwt'])->group(function () {
+    Route::get('dashboard', [AuthController::class, 'dashboard'])->name('dashboard');
+    Route::get('tabel-pakan', [IotController::class, 'index'])->name('tabel.pakan');
+    Route::get('sensor-health', function () {
+        return view('layouts.sensor-health');
+    })->name('sensor-health');
+    Route::get('status-kandang', function () {
+        return view('layouts.status');
+    })->name('status');
+    Route::get('kontrol-modul', function () {
+        return view('layouts.modul-kontrol');
+    })->name('kontrol.modul');
+});
