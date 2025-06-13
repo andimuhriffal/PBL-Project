@@ -115,7 +115,11 @@ public class DhtServiceImpl implements DhtService {
 
     @Override
     public DhtData ambilDataTerbaru() {
-        return dhtRepository.findTopByOrderByTimestampDesc();
+        DhtData latest = dhtRepository.findTopByOrderByTimestampDesc();
+        if (latest == null) {
+            throw new RuntimeException("❌ Data DHT11 belum tersedia.");
+        }
+        return latest;
     }
 
 }
