@@ -16,9 +16,9 @@ class IotController extends Controller
     public function getData()
     {
         try {
-            $dhtResponse = Http::timeout(3)->get('http://api-gateway-service:7000/api/dht11/latest');
-            $ultrasonikResponse = Http::timeout(3)->get('http://api-gateway-service:7000/api/ultrasonik/latest');
-            $rtcResponse = Http::timeout(3)->get('http://api-gateway-service:7000/api/rtc-time');
+            $dhtResponse = Http::timeout(3)->get('http://localhost:8081/api/dht11/latest');
+            $ultrasonikResponse = Http::timeout(3)->get('http://localhost:7000/api/ultrasonik/latest');
+            $rtcResponse = Http::timeout(3)->get('http://localhost:7000/api/rtc-time');
 
             $dht = $dhtResponse->successful() ? $dhtResponse->json() : [];
             $ultrasonik = $ultrasonikResponse->successful() ? $ultrasonikResponse->json() : [];

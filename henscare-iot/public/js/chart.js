@@ -102,25 +102,22 @@ function fetchAndUpdateCharts() {
         .then((data) => {
             const suhuValue = data.suhu;
             const kelembapanValue = data.kelembapan;
-            const tinggiAirSensor = parseFloat(data.tinggi_air); // Misalnya: 15.17
+            const tinggiAirSensor = parseFloat(data.tinggi_air);
 
-            const tinggiTabungCm = 15.17;
+            const tinggiTabungCm = 4;
             const displayMax = 4;
-            let tinggiAirAktual = tinggiTabungCm - tinggiAirSensor;
-            let normalizedTinggiAir =
-                (tinggiAirAktual / tinggiTabungCm) * displayMax;
 
-            if (normalizedTinggiAir > displayMax)
-                normalizedTinggiAir = displayMax;
-            if (normalizedTinggiAir < 0) normalizedTinggiAir = 0;
-
+            let tinggiAirAktual = Math.max(
+                0,
+                Math.min(tinggiAirSensor, tinggiTabungCm)
+            );
+            let normalizedTinggiAir = tinggiAirAktual;
             animateChartValue("suhuChart", suhuValue);
             document.getElementById("suhu-value").innerText = suhuValue + " °C";
 
             animateChartValue("kelembapanChart", kelembapanValue);
             document.getElementById("kelembapan-value").innerText =
                 kelembapanValue + " %";
-
             animateChartValue("tinggiAirChart", normalizedTinggiAir.toFixed(2));
         })
         .catch((error) => console.error("Gagal memuat data chart:", error));
@@ -133,5 +130,5 @@ window.fetchAndUpdateCharts = fetchAndUpdateCharts;
 document.addEventListener("DOMContentLoaded", function () {
     initCharts();
     fetchAndUpdateCharts();
-    setInterval(fetchAndUpdateCharts, 3000); // Update setiap 3 detik
+    setInterval(fetchAndUpdateCharts, 3000);
 });
