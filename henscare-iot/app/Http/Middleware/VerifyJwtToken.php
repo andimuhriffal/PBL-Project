@@ -16,7 +16,7 @@ class VerifyJwtToken
             return redirect()->route('login')->withErrors(['auth' => 'Silakan login terlebih dahulu.']);
         }
 
-        $response = Http::withToken($token)->get('http://192.168.1.16:8085/api/auth/validate');
+        $response = Http::withToken($token)->get('http://auth-service:8085/api/auth/validate');
 
         if ($response->status() !== 200) {
             session()->forget('jwt_token'); // hapus token kadaluarsa

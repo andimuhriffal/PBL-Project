@@ -26,7 +26,7 @@ class AuthController extends Controller
             'password' => 'required|min:6|confirmed',
         ]);
 
-        $response = Http::post('http://192.168.1.16:8085/api/auth/register', [
+        $response = Http::post('http://auth-service:8085/api/auth/register', [
             'name' => $request->name,
             'email' => $request->email,
             'password' => $request->password,
@@ -49,7 +49,7 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        $response = Http::post('http://192.168.1.16:8085/api/auth/login', [
+        $response = Http::post('http://auth-service:8085/api/auth/login', [
             'email' => $request->email,
             'password' => $request->password,
         ]);
@@ -78,7 +78,7 @@ class AuthController extends Controller
         }
 
         // Panggil endpoint validasi atau data protected di auth-service
-        $response = Http::withToken($token)->get('http://192.168.1.16:8085/api/auth/validate');
+        $response = Http::withToken($token)->get('http://auth-service:8085/api/auth/validate');
 
         if ($response->successful()) {
             $userEmail = $response->body(); // Misal: email pengguna

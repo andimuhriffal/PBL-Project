@@ -35,12 +35,6 @@
                 <i class="fas fa-lightbulb me-2"></i> Kondisi Otomatisasi
             </a>
         </li>
-        <li class="nav-item mb-1">
-            <a href="/kontrol-modul"
-                class="nav-link d-flex align-items-center rounded {{ request()->is('kontrol-modul') ? 'active bg-primary text-white' : 'text-dark' }}">
-                <i class="fas fa-hand-point-right me-2"></i> Kontrol Alat
-            </a>
-        </li>
 
     </ul>
 
